@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "root",
+    "password": "pass123",
+    "database": "docker",
+    "host": "mysql-db",
+    "dialect": "mysql"
+  },
+  "test": {
+    "username": "root",
+    "password": "pass123",
+    "database": "docker",
+    "host": "mysql-db",
+    "dialect": "mysql"
+  },
+  "production": {
+    "username": "root",
+    "password": "pass123",
+    "database": "docker",
+    "host": "mysql-db",
+    "dialect": "mysql"
+  }
+}

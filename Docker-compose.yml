@@ -1,0 +1,47 @@
+version: '3.8'  # Update if you're using an older version
+services:
+  node-app:
+    build: .
+    container_name: node-app
+    restart: always
+    ports:
+      - "7575:7575"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql-db
+      - DB_USER=root
+      - DB_PASSWORD=pass123
+      - DB_NAME=docker
+    volumes:
+      - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
+    command: nodemon --legacy-watch --exec ts-node src/index.ts
+    depends_on:
+      - mysql-db
+   
+
+  mysql-db:
+    image: mysql:8
+    container_name: mysql-db
+    restart: always
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: pass123  # Set the MySQL root password
+      MYSQL_DATABASE: docker  # Name of the database to create
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persistent storage for MySQL data
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"  # phpMyAdmin accessible at http://localhost:8080
+    environment:
+      PMA_HOST: mysql-db  # Hostname of the MySQL service
+      MYSQL_ROOT_PASSWORD: root_password  # Root password for phpMyAdmin access
+    depends_on:
+      - mysql-db  # Ensure MySQL is running before phpMyAdmin starts
+
+volumes:
+  mysql-data:  # Volume for persistent MySQL storage
