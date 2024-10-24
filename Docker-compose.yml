@@ -1,4 +1,5 @@
-version: '3.8'  # Update if you're using an older version
+version: "3.8"
+
 services:
   node-app:
     build: .
@@ -12,12 +13,13 @@ services:
       - DB_USER=root
       - DB_PASSWORD=pass123
       - DB_NAME=docker
+      - REDIS_URL=redis://redis:6379 # Updated to match the Redis service name
     volumes:
       - .:/usr/src/app # Mount the current directory to /usr/src/app in the container
     command: nodemon --legacy-watch --exec ts-node src/index.ts
     depends_on:
       - mysql-db
-   
+      - redis # Ensure Redis is running before the app starts
 
   mysql-db:
     image: mysql:8
@@ -26,22 +28,40 @@ services:
     ports:
       - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: pass123  # Set the MySQL root password
-      MYSQL_DATABASE: docker  # Name of the database to create
+      MYSQL_ROOT_PASSWORD: pass123 # Set the MySQL root password
+      MYSQL_DATABASE: docker # Name of the database to create
     volumes:
-      - mysql-data:/var/lib/mysql  # Persistent storage for MySQL data
+      - mysql-data:/var/lib/mysql # Persistent storage for MySQL data
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     restart: always
     ports:
-      - "8080:80"  # phpMyAdmin accessible at http://localhost:8080
+      - "8080:80" # phpMyAdmin accessible at http://localhost:8080
     environment:
-      PMA_HOST: mysql-db  # Hostname of the MySQL service
-      MYSQL_ROOT_PASSWORD: root_password  # Root password for phpMyAdmin access
+      PMA_HOST: mysql-db # Hostname of the MySQL service
+      PMA_USER: root # Use the correct MySQL user
+      PMA_PASSWORD: pass123 # Match with MYSQL_ROOT_PASSWORD
     depends_on:
-      - mysql-db  # Ensure MySQL is running before phpMyAdmin starts
+      - mysql-db # Ensure MySQL is running before phpMyAdmin starts
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis # Optionally specify a container name for Redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--requirepass", "secret"] # Start Redis with password protection if needed
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    volumes:
+      - redis-insight:/data
 
 volumes:
-  mysql-data:  # Volume for persistent MySQL storage
+  mysql-data: # Volume for persistent MySQL storage
+  redis-insight: # Volume for Redis Insight data
