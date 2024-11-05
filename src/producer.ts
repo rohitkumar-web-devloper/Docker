@@ -1,18 +1,14 @@
 import kafka from "./kafka";
-
-async function init() {
-    const producer = kafka.producer();
+const producer = kafka.producer();
+export default async function produ() {
     console.log("Connecting producer")
-    await producer.connect()
-    console.log("Producer Connected successfully");
+    await producer.connect();
     await producer.send({
-        topic: "rider-updates",
-        messages: [
-            {
-                key: "name", value: "Tony Stark" , partition:0 
-            }
-        ]
-    })
-await producer.disconnect()
+      topic: 'light-control', // The topic where messages will be sent
+      messages: [
+        { value: JSON.stringify({ deviceId: 'light_1', command: 'on' }) },
+      ],
+    });
+    console.log('Message sent successfully');
+    await producer.disconnect();
 }
-init()
